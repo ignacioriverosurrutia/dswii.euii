@@ -28,6 +28,9 @@ public class MesaService {
      * Obtener mesa por ID
      */
     public Optional<Mesa> obtenerMesaPorId(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return mesaRepository.findById(id);
     }
 
@@ -85,6 +88,9 @@ public class MesaService {
      * Actualizar mesa existente
      */
     public Mesa actualizarMesa(Long id, Mesa mesaActualizada) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
         Mesa mesaExistente = mesaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada con ID: " + id));
 
@@ -107,6 +113,9 @@ public class MesaService {
      * Cambiar disponibilidad de una mesa
      */
     public Mesa cambiarDisponibilidad(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada con ID: " + id));
 
@@ -118,6 +127,9 @@ public class MesaService {
      * Marcar mesa como disponible
      */
     public Mesa marcarComoDisponible(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada con ID: " + id));
 
@@ -129,6 +141,9 @@ public class MesaService {
      * Marcar mesa como no disponible
      */
     public Mesa marcarComoNoDisponible(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada con ID: " + id));
 
@@ -140,6 +155,9 @@ public class MesaService {
      * Eliminar mesa por ID
      */
     public void eliminarMesa(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada con ID: " + id));
 
@@ -148,13 +166,16 @@ public class MesaService {
             throw new IllegalStateException("No se puede eliminar la mesa porque tiene reservas asociadas. Elimine primero las reservas.");
         }
 
-        mesaRepository.deleteById(id);
+        mesaRepository.delete(mesa);
     }
 
     /**
      * Verificar si una mesa existe
      */
     public boolean existeMesa(Long id) {
+        if (id == null) {
+            return false;
+        }
         return mesaRepository.existsById(id);
     }
 

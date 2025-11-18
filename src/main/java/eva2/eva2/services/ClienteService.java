@@ -33,6 +33,9 @@ public class ClienteService {
      * Obtener cliente por ID
      */
     public Optional<Cliente> obtenerClientePorId(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return clienteRepository.findById(id);
     }
 
@@ -80,6 +83,9 @@ public class ClienteService {
      * Actualizar cliente existente
      */
     public Cliente actualizarCliente(Long id, Cliente clienteActualizado) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo");
+        }
         Cliente clienteExistente = clienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
 
@@ -98,6 +104,9 @@ public class ClienteService {
      * Eliminar cliente por ID
      */
     public void eliminarCliente(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo");
+        }
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
 
@@ -106,13 +115,16 @@ public class ClienteService {
             throw new IllegalStateException("No se puede eliminar el cliente porque tiene reservas asociadas. Elimine primero las reservas.");
         }
 
-        clienteRepository.deleteById(id);
+        clienteRepository.delete(cliente);
     }
 
     /**
      * Verificar si un cliente existe
      */
     public boolean existeCliente(Long id) {
+        if (id == null) {
+            return false;
+        }
         return clienteRepository.existsById(id);
     }
 

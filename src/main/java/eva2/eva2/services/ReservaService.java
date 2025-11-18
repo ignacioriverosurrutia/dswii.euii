@@ -39,6 +39,9 @@ public class ReservaService {
      * Obtener reserva por ID
      */
     public Optional<Reserva> obtenerReservaPorId(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return reservaRepository.findById(id);
     }
 
@@ -78,6 +81,9 @@ public class ReservaService {
      * Obtener reservas de una mesa específica
      */
     public List<Reserva> obtenerReservasPorMesa(Long mesaId) {
+        if (mesaId == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
         Mesa mesa = mesaRepository.findById(mesaId)
                 .orElseThrow(() -> new IllegalArgumentException("Mesa no encontrada"));
         return reservaRepository.findByMesa(mesa);
@@ -94,6 +100,16 @@ public class ReservaService {
      * Crear una nueva reserva con validaciones completas
      */
     public Reserva crearReserva(Long clienteId, Long mesaId, LocalDateTime fechaHora) {
+        // Validar que clienteId no sea nulo
+        if (clienteId == null) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo");
+        }
+        
+        // Validar que mesaId no sea nulo
+        if (mesaId == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
+        
         // Validar que el cliente existe
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + clienteId));
@@ -140,6 +156,16 @@ public class ReservaService {
      * Actualizar una reserva existente
      */
     public Reserva actualizarReserva(Long id, Long clienteId, Long mesaId, LocalDateTime fechaHora) {
+        if (id == null) {
+            throw new IllegalArgumentException("El ID de la reserva no puede ser nulo");
+        }
+        if (clienteId == null) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo");
+        }
+        if (mesaId == null) {
+            throw new IllegalArgumentException("El ID de la mesa no puede ser nulo");
+        }
+        
         Reserva reservaExistente = reservaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada con ID: " + id));
 
@@ -174,16 +200,25 @@ public class ReservaService {
      * Cancelar/eliminar una reserva
      */
     public void cancelarReserva(Long id) {
-        Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada con ID: " + id));
-
-        reservaRepository.delete(reserva);
+        if (id == null) {
+            throw new IllegalArgumentException("El ID de la reserva no puede ser nulo");
+        }
+        if (!reservaRepository.existsById(id)) {
+            throw new IllegalArgumentException("Reserva no encontrada con ID: " + id);
+        }
+        reservaRepository.deleteById(id);
     }
 
     /**
      * Cancelar reserva verificando que pertenece al cliente
      */
     public void cancelarReservaPorCliente(Long reservaId, Long clienteId) {
+        if (reservaId == null) {
+            throw new IllegalArgumentException("El ID de la reserva no puede ser nulo");
+        }
+        if (clienteId == null) {
+            throw new IllegalArgumentException("El ID del cliente no puede ser nulo");
+        }
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada con ID: " + reservaId));
 
@@ -197,13 +232,16 @@ public class ReservaService {
             throw new IllegalStateException("No se pueden cancelar reservas pasadas");
         }
 
-        reservaRepository.deleteById(reservaId);
+        reservaRepository.delete(reserva);
     }
 
     /**
      * Verificar si existe una reserva cercana (dentro de 2 horas)
      */
     private boolean existeReservaCercana(Long mesaId, LocalDateTime fechaHora) {
+        if (mesaId == null) {
+            return false;
+        }
         LocalDateTime dosHorasAntes = fechaHora.minusHours(2);
         LocalDateTime dosHorasDespues = fechaHora.plusHours(2);
 
@@ -258,6 +296,9 @@ public class ReservaService {
      * Verificar si una reserva pertenece a un cliente
      */
     public boolean reservaPerteneceACliente(Long reservaId, Long clienteId) {
+        if (reservaId == null || clienteId == null) {
+            return false;
+        }
         Reserva reserva = reservaRepository.findById(reservaId).orElse(null);
         return reserva != null && reserva.getCliente().getId().equals(clienteId);
     }
